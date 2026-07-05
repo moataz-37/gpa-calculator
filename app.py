@@ -33,8 +33,10 @@ def get_grade_label(gpa):
 tab1, tab2 = st.tabs(["حساب ترم واحد", "حساب التراكمي العام"])
 
 with tab1:
-    st.subheader("إدخال مواد الترم الحالي (6 مواد)")
+    st.subheader("إدخال مواد الترم الحالي (إجمالي 18 ساعة)")
     semester_points = 0
+    total_hours_input = 0
+    
     for i in range(6):
         col1, col2 = st.columns(2)
         with col1:
@@ -42,10 +44,16 @@ with tab1:
         with col2:
             hours = st.number_input(f"ساعات مادة {i+1}", min_value=1, max_value=4, value=3, key=f"s_h{i}")
         semester_points += grade_map[grade] * hours
+        total_hours_input += hours
     
     if st.button("احسب GPA الترم"):
-        gpa = semester_points / 18
-        st.success(f"معدل الترم هو: {gpa:.2f} - التقدير: {get_grade_label(gpa)}")
+        if total_hours_input > 18:
+            st.error(f"خطأ: مجموع الساعات ({total_hours_input}) يتجاوز 18 ساعة المسموحة!")
+        elif total_hours_input < 18:
+            st.warning(f"تنبيه: مجموع الساعات ({total_hours_input}) أقل من 18، قد لا تكون النتيجة دقيقة.")
+        else:
+            gpa = semester_points / 18
+            st.success(f"معدل الترم هو: {gpa:.2f} - التقدير: {get_grade_label(gpa)}")
 
 with tab2:
     st.subheader("حساب التراكمي (CGPA)")
