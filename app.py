@@ -58,28 +58,28 @@ with tab1:
 with tab2:
     st.subheader("حساب التراكمي (CGPA)")
     
-    # 1. الأساسيات
+    # معلومات سابقة
     num_prev_terms = st.number_input("عدد الترمات السابقة:", min_value=0, value=0)
     prev_gpa = st.number_input("أدخل المعدل التراكمي السابق (CGPA):", min_value=0.0, max_value=4.0, step=0.01)
     
-    # 2. الترم الحالي (اختياري)
-    include_second_term = st.checkbox("هل تريد إضافة بيانات الترم الحالي؟")
+    # خيارات الترمات
+    add_term1 = st.checkbox("إضافة بيانات الترم الأول")
+    term1_gpa = st.number_input("معدل الترم الأول:", min_value=0.0, max_value=4.0, step=0.01) if add_term1 else 0.0
     
-    current_gpa = 0.0
-    if include_second_term:
-        current_gpa = st.number_input("أدخل معدل الترم الحالي:", min_value=0.0, max_value=4.0, step=0.01)
+    add_term2 = st.checkbox("إضافة بيانات الترم الثاني")
+    term2_gpa = st.number_input("معدل الترم الثاني:", min_value=0.0, max_value=4.0, step=0.01) if add_term2 else 0.0
     
     if st.button("احسب التراكمي النهائي"):
         prev_hours = num_prev_terms * 18
-        # إذا كان الترم الثاني غير مفعل، نعتبر ساعات الترم الحالي 0
-        current_hours = 18 if include_second_term else 0
+        term1_hours = 18 if add_term1 else 0
+        term2_hours = 18 if add_term2 else 0
         
-        total_points = (prev_gpa * prev_hours) + (current_gpa * current_hours)
-        total_hours = prev_hours + current_hours
+        total_points = (prev_gpa * prev_hours) + (term1_gpa * term1_hours) + (term2_gpa * term2_hours)
+        total_hours = prev_hours + term1_hours + term2_hours
         
         if total_hours > 0:
             cgpa = total_points / total_hours
             st.metric("المعدل التراكمي الجديد", f"{cgpa:.2f}")
             st.write(f"### التقدير العام: {get_grade_label(cgpa)}")
         else:
-            st.error("يرجى إدخال البيانات بشكل صحيح")
+            st.error("يرجى تفعيل ترم واحد على الأقل وإدخال بياناته")
