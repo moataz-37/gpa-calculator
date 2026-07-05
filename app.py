@@ -74,6 +74,3 @@ with tab2:
         else:
             st.error("يرجى إدخال البيانات بشكل صحيح")
 
-# 6. التوقيع
-st.markdown("---")
-st.markdown("**Moataz Sultan** ")
