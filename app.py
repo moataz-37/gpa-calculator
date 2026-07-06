@@ -22,7 +22,7 @@ def get_grade_label(gpa):
     elif gpa >= 1.00: return "مقبول"
     else: return "راسب"
 
-tab1, tab2, tab3 = st.tabs(["حساب الترم", "حساب التراكمي", "قارئ الشهادات"])
+tab1, tab2 = st.tabs(["حساب الترم", "حساب التراكمي"])
 
 with tab1:
     st.subheader("إدخال مواد الترم الحالي (إجمالي 18 ساعة)")
@@ -74,31 +74,4 @@ with tab2:
         else:
             st.error("يرجى تفعيل ترم واحد على الأقل وإدخال بياناته")
 
-import easyocr
-import numpy as np
-from PIL import Image
 
-with tab3:
-    st.subheader("🤖 القارئ الذكي للشهادات (AIET)")
-    uploaded_file = st.file_uploader("ارفع صورة الشهادة (Screenshot)...", type=['png', 'jpg', 'jpeg'])
-    
-    if uploaded_file is not None:
-        image = Image.open(uploaded_file)
-        st.image(image, caption='الشهادة المرفوعة', use_column_width=True)
-        
-        if st.button("استخراج البيانات وحساب GPA"):
-            with st.spinner('جاري تحليل الشهادة...'):
-                # تهيئة قارئ النصوص
-                reader = easyocr.Reader(['ar', 'en'])
-                # تحويل الصورة لـ numpy array عشان المكتبة تقراها
-                img_array = np.array(image)
-                results = reader.readtext(img_array)
-                
-                # هنا بنعرض اللي الـ AI شافه في الصورة
-                st.write("تم استخراج النصوص التالية من الصورة:")
-                extracted_text = [res[1] for res in results]
-                st.write(extracted_text)
-                
-                # ملاحظة: المرحلة الجاية هي "تنظيف" هذه النصوص 
-                # وفلترتها عشان نطلع منها (التقدير والساعات) فقط
-                st.success("تم الاستخراج! الخطوة الجاية هي تحويل هذه النصوص لأرقام GPA.")
