@@ -66,8 +66,8 @@ with tab2:
 with tab3:
     st.subheader("تخطيط التخرج الذكي 🎓")
     
-    # مدخلات الطالب (عدد الترمات والتقدير)
-    target_gpa = st.select_slider("التقدير المستهدف للتخرج:", options=[1.0, 1.7, 2.7, 3.5], format_func=get_grade_label)
+    # المدخلات
+    target_gpa = st.select_slider("التقدير المستهدف:", options=[1.0, 1.7, 2.7, 3.5], format_func=get_grade_label)
     
     col1, col2 = st.columns(2)
     with col1:
@@ -75,27 +75,29 @@ with tab3:
     with col2:
         terms_done = st.number_input("عدد الترمات التي أنهيتها:", min_value=0, value=6)
     
-    current_cgpa = st.number_input("معدلك التراكمي الحالي:", min_value=0.0, max_value=4.0, value=2.0, step=0.01)
+    current_cgpa = st.number_input("المعدل التراكمي الحالي:", min_value=0.0, max_value=4.0, value=2.0, step=0.01)
     
-    if st.button("احسب المطلوب"):
-        # الحساب التلقائي للساعات
-        done_hours = terms_done * 18
-        rem_hours = terms_left * 18
-        total_hours = done_hours + rem_hours
-        
-        # معادلة التخطيط
+    # الحساب التلقائي (بدون زرار)
+    done_hours = terms_done * 18
+    rem_hours = terms_left * 18
+    total_hours = done_hours + rem_hours
+    
+    # معادلة التخطيط
+    if total_hours > 0:
         total_needed_points = target_gpa * total_hours
         current_points = current_cgpa * done_hours
-        required_gpa = (total_needed_points - current_points) / rem_hours
         
-        # عرض النتائج
-        st.write(f"---")
-        st.write(f"📊 **إجمالي الساعات:** {total_hours} ساعة")
-        
-        if required_gpa > 4.0:
-            st.error(f"للأسف، لا يمكن الوصول لتقدير {get_grade_label(target_gpa)} بالمعدل الحالي.")
-        elif required_gpa < 0:
-            st.success("أنت بالفعل حققت هذا التقدير أو أكثر!")
+        # التأكد من عدم القسمة على صفر إذا كان المتبقي 0
+        if rem_hours > 0:
+            required_gpa = (total_needed_points - current_points) / rem_hours
+            
+            st.write(f"---")
+            if required_gpa > 4.0:
+                st.error(f"للأسف، لا يمكن الوصول لتقدير {get_grade_label(target_gpa)} بالمعدل الحالي.")
+            elif required_gpa < 0:
+                st.success("أنت بالفعل حققت هذا التقدير أو أكثر!")
+            else:
+                st.metric("المعدل المطلوب في الترمات القادمة", f"{required_gpa:.2f}")
+                st.info(f"يجب أن تحافظ على معدل **{required_gpa:.2f}** في الترمات المتبقية لتتخرج بتقدير **{get_grade_label(target_gpa)}**.")
         else:
-            st.metric("المعدل المطلوب في الترمات القادمة", f"{required_gpa:.2f}")
-            st.info(f"يجب أن تحافظ على معدل **{required_gpa:.2f}** على الأقل في الترمات المتبقية لتتخرج بتقدير **{get_grade_label(target_gpa)}**.")
+            st.success("لقد أنهيت جميع الساعات المطلوبة!")
