@@ -65,57 +65,56 @@ with tab2:
         
 with tab3:
     st.subheader("تخطيط التخرج الذكي 🎓")
+
+    # تعريف التقديرات وقيمها
+    labels = ["مقبول", "جيد", "جيد جداً", "ممتاز"]
+    values = [1.0, 1.7, 2.7, 3.5]
     
-    # تعريف التقديرات وقيمها الرقمية
-    labels = ["راسب", "مقبول", "جيد", "جيد جداً", "ممتاز"]
-    values = [0.0, 1.0, 1.7, 2.7, 3.5]
+    # تهيئة الحالة
+    if 'idx' not in st.session_state:
+        st.session_state.idx = 1 # البداية عند "جيد"
+
+    # توزيع الأزرار والسلايدر في سطر واحد
+    c1, c2, c3 = st.columns([1, 6, 1])
     
-    # دالة مساعدة لتحويل القيمة لـ Index والعكس
-    def get_index(val):
-        return values.index(val) if val in values else 0
+    with c1:
+        if st.button("➖"):
+            if st.session_state.idx > 0: st.session_state.idx -= 1
+    
+    with c2:
+        st.session_state.idx = st.select_slider(
+            "اختر التقدير المستهدف:",
+            options=range(len(labels)),
+            value=st.session_state.idx,
+            format_func=lambda x: labels[x]
+        )
+        
+    with c3:
+        if st.button("➕"):
+            if st.session_state.idx < len(labels) - 1: st.session_state.idx += 1
 
-    if 'target_val' not in st.session_state:
-        st.session_state.target_val = 2.7
-
-    # السلايدر للتقديرات (سحب)
-    idx = st.select_slider(
-        "اختر التقدير المستهدف:", 
-        options=range(len(values)), 
-        value=get_index(st.session_state.target_val),
-        format_func=lambda x: labels[x]
-    )
-    st.session_state.target_val = values[idx]
-
-    # الزرار (+/-) للتحكم الدقيق في التقدير
-    new_idx = st.number_input("أو تحكم بالترتيب:", min_value=0, max_value=len(values)-1, value=idx, step=1)
-    st.session_state.target_val = values[new_idx]
-
-    st.write(f"المعدل المطلوب للتقدير المستهدف: **{st.session_state.target_val}**")
-
-    # بقية الحسابات (نفس المنطق السابق)
+    # استخراج القيمة المختارة
+    target_val = values[st.session_state.idx]
+    
+    # المدخلات الأساسية
     col1, col2 = st.columns(2)
-    with col1:
-        terms_left = st.number_input("عدد الترمات المتبقية:", min_value=0, value=4)
-    with col2:
-        terms_done = st.number_input("عدد الترمات التي أنهيتها:", min_value=0, value=6)
-    
+    terms_left = col1.number_input("عدد الترمات المتبقية:", min_value=0, value=4)
+    terms_done = col2.number_input("عدد الترمات التي أنهيتها:", min_value=0, value=6)
     current_cgpa = st.number_input("معدلك التراكمي الحالي:", min_value=0.0, max_value=4.0, value=2.0, step=0.01)
     
+    # الحساب التلقائي
     done_hours = terms_done * 18
     rem_hours = terms_left * 18
     total_hours = done_hours + rem_hours
     
-    if total_hours > 0:
-        total_needed_points = st.session_state.target_val * total_hours
-        current_points = current_cgpa * done_hours
+    if total_hours > 0 and rem_hours > 0:
+        required_gpa = (target_val * total_hours - current_cgpa * done_hours) / rem_hours
         
-        if rem_hours > 0:
-            required_gpa = (total_needed_points - current_points) / rem_hours
-            st.write(f"---")
-            if required_gpa > 4.0:
-                st.error(f"لا يمكن الوصول لتقدير {labels[new_idx]} بالمعدل الحالي.")
-            elif required_gpa < 0:
-                st.success("أنت بالفعل حققت هذا التقدير أو أكثر!")
-            else:
-                st.metric("المعدل المطلوب في الترمات القادمة", f"{required_gpa:.2f}")
-                st.info(f"يجب أن تحافظ على معدل **{required_gpa:.2f}** في الترمات المتبقية لتتخرج بتقدير **{labels[new_idx]}**.")
+        st.write("---")
+        if required_gpa > 4.0:
+            st.error(f"لا يمكن الوصول لتقدير {labels[st.session_state.idx]} بالمعدل الحالي.")
+        elif required_gpa < 0:
+            st.success("أنت بالفعل حققت هذا التقدير أو أكثر!")
+        else:
+            st.metric("المعدل المطلوب في الترمات القادمة", f"{required_gpa:.2f}")
+            st.info(f"يجب أن تحافظ على معدل **{required_gpa:.2f}** لتتخرج بتقدير **{labels[st.session_state.idx]}**.")
