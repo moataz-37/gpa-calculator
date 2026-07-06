@@ -1,5 +1,2 @@
 streamlit
 Pillow
-easyocr
-opencv-python
-numpy
