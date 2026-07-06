@@ -118,6 +118,6 @@ with tab3:
             # عرض الرينج
             if st.session_state.idx < len(values) - 1:
                 st.metric("الرينج المطلوب", f"{max(0, min_required_gpa):.2f} - {min(4.0, max_required_gpa):.2f}")
-                st.caption(f"يجب أن تحافظ على معدل بين {max(0, min_required_gpa):.2f} و {min(4.0, max_required_gpa):.2f} للوصول لهذه الفئة.")
+                st.caption(f"محتاج تحافظ علي رينج بين {max(0, min_required_gpa):.2f} و {min(4.0, max_required_gpa):.2f} علشان التقدير ده")
             else:
                 st.metric("المعدل الأدنى المطلوب", f"{max(0, min_required_gpa):.2f}")
