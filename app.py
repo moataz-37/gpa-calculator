@@ -64,7 +64,6 @@ with tab2:
 with tab3:
     st.subheader("حساب تقدير التخرج")
 
-    # تعريف التقديرات
     labels = ["مقبول", "جيد", "جيد جداً", "ممتاز"]
     values = [1.0, 1.7, 2.7, 3.5]
     
@@ -115,7 +114,6 @@ with tab3:
             next_val = values[next_idx]
             max_required_gpa = (next_val * total_hours - current_cgpa * done_hours) / rem_hours
             
-            # عرض الرينج
             if st.session_state.idx < len(values) - 1:
                 st.metric("الرينج المطلوب", f"{max(0, min_required_gpa):.2f} - {min(4.0, max_required_gpa):.2f}")
                 st.caption(f"محتاج تحافظ علي رينج بين {max(0, min_required_gpa):.2f} و {min(4.0, max_required_gpa):.2f} علشان التقدير ده")
