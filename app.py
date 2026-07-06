@@ -1,27 +1,20 @@
 import streamlit as st
 from PIL import Image
 
-# 1. إعدادات الصفحة
 st.set_page_config(page_title="بصمجيات", page_icon="🤖", layout="wide")
 
-# 2. إضافة اللوجو
 try:
-    # محاولة فتح الصورة بصيغة jpg بما أنها النوع الموجود عندك
     image = Image.open('logo.jpg') 
     st.image(image, width=150)
 except:
-    # لو حصل أي خطأ، هيطبع اسم البرنامج كبديل
     st.info("💡  GPA بصمجيات ال   ")
 
-# 3. العنوان
-st.title(" 👷بصمجيات حساب التقدير   ")
+st.title(" بصمجيات لحساب التقدير   ")
 
-# 4. نظام التقديرات
 grade_map = {
     'A': 4.0, 'A-': 3.7, 'B+': 3.3, 'B': 3.0, 
     'B-': 2.7, 'C+': 2.3, 'C': 2.0, 'C-': 1.7, 'D+': 1.3, 'D': 1.0, 'F': 0.0
 }
-
 def get_grade_label(gpa):
     if gpa >= 3.50: return "ممتاز"
     elif gpa >= 2.70: return "جيد جداً"
@@ -29,7 +22,6 @@ def get_grade_label(gpa):
     elif gpa >= 1.00: return "مقبول"
     else: return "راسب"
 
-# 5. التبويبات
 tab1, tab2 = st.tabs(["حساب ترم واحد", "حساب التراكمي العام"])
 
 with tab1:
@@ -58,11 +50,9 @@ with tab1:
 with tab2:
     st.subheader("حساب التراكمي (CGPA)")
     
-    # معلومات سابقة
     num_prev_terms = st.number_input("عدد الترمات السابقة:", min_value=0, value=0)
     prev_gpa = st.number_input("أدخل المعدل التراكمي السابق (CGPA):", min_value=0.0, max_value=4.0, step=0.01)
     
-    # خيارات الترمات
     add_term1 = st.checkbox("إضافة بيانات الترم الأول")
     term1_gpa = st.number_input("معدل الترم الأول:", min_value=0.0, max_value=4.0, step=0.01) if add_term1 else 0.0
     
