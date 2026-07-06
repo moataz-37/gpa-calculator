@@ -103,7 +103,7 @@ with tab3:
         st.write("---")
         
         if min_required_gpa > 4.0:
-            st.error(f"لا يمكن الوصول لتقدير {labels[st.session_state.idx]} بالمعدل الحالي.")
+            st.error(f"لا يمكن الوصول لتقدير {labels[st.session_state.idx]} بالمعدل الحالي")
         elif min_required_gpa < 0:
             st.success("أنت بالفعل حققت هذا التقدير أو أكثر!")
         else:
