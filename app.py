@@ -62,24 +62,37 @@ with tab2:
         cgpa = total_points / total_hours
         st.metric("المعدل التراكمي النهائي", f"{cgpa:.2f}")
         st.write(f"### التقدير العام: {get_grade_label(cgpa)}")
+        
 with tab3:
     st.subheader("تخطيط التخرج الذكي 🎓")
     
-    # خدعة التنسيق: السلايدر والزرار جنب بعض
-    col_a, col_b = st.columns([3, 1])
+    # تعريف التقديرات وقيمها الرقمية
+    labels = ["راسب", "مقبول", "جيد", "جيد جداً", "ممتاز"]
+    values = [0.0, 1.0, 1.7, 2.7, 3.5]
     
-    # القيمة الافتراضية
-    if 'target_val' not in st.session_state:
-        st.session_state.target_val = 3.0
+    # دالة مساعدة لتحويل القيمة لـ Index والعكس
+    def get_index(val):
+        return values.index(val) if val in values else 0
 
-    with col_a:
-        st.session_state.target_val = st.slider("اختر المعدل التراكمي المستهدف:", 1.0, 4.0, st.session_state.target_val, 0.1)
-    with col_b:
-        st.session_state.target_val = st.number_input("أو أدخل يدوياً:", min_value=1.0, max_value=4.0, value=st.session_state.target_val, step=0.1)
-    
-    st.write(f"التقدير المستهدف: **{get_grade_label(st.session_state.target_val)}**")
-    
-    # بقية المدخلات (تلقائية)
+    if 'target_val' not in st.session_state:
+        st.session_state.target_val = 2.7
+
+    # السلايدر للتقديرات (سحب)
+    idx = st.select_slider(
+        "اختر التقدير المستهدف:", 
+        options=range(len(values)), 
+        value=get_index(st.session_state.target_val),
+        format_func=lambda x: labels[x]
+    )
+    st.session_state.target_val = values[idx]
+
+    # الزرار (+/-) للتحكم الدقيق في التقدير
+    new_idx = st.number_input("أو تحكم بالترتيب:", min_value=0, max_value=len(values)-1, value=idx, step=1)
+    st.session_state.target_val = values[new_idx]
+
+    st.write(f"المعدل المطلوب للتقدير المستهدف: **{st.session_state.target_val}**")
+
+    # بقية الحسابات (نفس المنطق السابق)
     col1, col2 = st.columns(2)
     with col1:
         terms_left = st.number_input("عدد الترمات المتبقية:", min_value=0, value=4)
@@ -88,7 +101,6 @@ with tab3:
     
     current_cgpa = st.number_input("معدلك التراكمي الحالي:", min_value=0.0, max_value=4.0, value=2.0, step=0.01)
     
-    # الحساب التلقائي
     done_hours = terms_done * 18
     rem_hours = terms_left * 18
     total_hours = done_hours + rem_hours
@@ -99,12 +111,11 @@ with tab3:
         
         if rem_hours > 0:
             required_gpa = (total_needed_points - current_points) / rem_hours
-            
             st.write(f"---")
             if required_gpa > 4.0:
-                st.error(f"للأسف، لا يمكن الوصول لتقدير {get_grade_label(st.session_state.target_val)} بالمعدل الحالي.")
+                st.error(f"لا يمكن الوصول لتقدير {labels[new_idx]} بالمعدل الحالي.")
             elif required_gpa < 0:
                 st.success("أنت بالفعل حققت هذا التقدير أو أكثر!")
             else:
                 st.metric("المعدل المطلوب في الترمات القادمة", f"{required_gpa:.2f}")
-                st.info(f"يجب أن تحافظ على معدل **{required_gpa:.2f}** في الترمات المتبقية لتتخرج بتقدير **{get_grade_label(st.session_state.target_val)}**.")
+                st.info(f"يجب أن تحافظ على معدل **{required_gpa:.2f}** في الترمات المتبقية لتتخرج بتقدير **{labels[new_idx]}**.")
