@@ -108,7 +108,7 @@ with tab3:
             st.success("أنت بالفعل حققت هذا التقدير أو أكثر!")
         else:
 
-            st.info(f"للحصول على تقدير **{labels[st.session_state.idx]}**:")
+            st.info(f"للحصول على تقدير **{labels[st.session_state.idx]}**")
             
 
             next_idx = min(st.session_state.idx + 1, len(values) - 1)
