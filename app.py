@@ -1,17 +1,15 @@
 import streamlit as st
 from PIL import Image
 
-# إعدادات الصفحة
 st.set_page_config(page_title="بصمجيات", layout="centered")
 
-# اللوجو
 try:
     image = Image.open('logo.jpg') 
     st.image(image, width=150)
 except:
-    st.info("💡 بصمجيات - مساعدك الأكاديمي")
+    st.info("بصمجيات لحساب التقدير ")
 
-st.title("بصمجيات ⚡")
+st.title("بصمجيات لحساب التقدير ")
 
 grade_map = {'A': 4.0, 'A-': 3.7, 'B+': 3.3, 'B': 3.0, 'B-': 2.7, 'C+': 2.3, 'C': 2.0, 'C-': 1.7, 'D+': 1.3, 'D': 1.0, 'F': 0.0}
 
@@ -22,8 +20,8 @@ def get_grade_label(gpa):
     elif gpa >= 1.00: return "مقبول"
     else: return "راسب"
 
-# إضافة التبويب الثالث
-tab1, tab2, tab3 = st.tabs(["الترم الحالي", "التراكمي", "حاسبة التخرج 🎓"])
+
+tab1, tab2, tab3 = st.tabs(["الترم الحالي", "التراكمي", "تقدير التخرج 🎓"])
 
 with tab1:
     semester_points = 0
@@ -64,7 +62,7 @@ with tab2:
         st.write(f"### التقدير العام: {get_grade_label(cgpa)}")
         
 with tab3:
-    st.subheader("تخطيط التخرج الواقعي 🎯")
+    st.subheader("تخطيط للتخرج")
 
     # تعريف التقديرات
     labels = ["مقبول", "جيد", "جيد جداً", "ممتاز"]
@@ -99,7 +97,7 @@ with tab3:
         rem_hours = terms_left * 18
         total_hours = done_hours + rem_hours
         
-        # الحساب للتقدير المستهدف
+
         min_required_gpa = (target_val * total_hours - current_cgpa * done_hours) / rem_hours
         
         st.write("---")
@@ -109,17 +107,17 @@ with tab3:
         elif min_required_gpa < 0:
             st.success("أنت بالفعل حققت هذا التقدير أو أكثر!")
         else:
-            # هنا التغيير: عرض "الرينج" المطلوب
+
             st.info(f"للحصول على تقدير **{labels[st.session_state.idx]}**:")
             
-            # حساب التقدير التالي للرينج
+
             next_idx = min(st.session_state.idx + 1, len(values) - 1)
             next_val = values[next_idx]
             max_required_gpa = (next_val * total_hours - current_cgpa * done_hours) / rem_hours
             
             # عرض الرينج
             if st.session_state.idx < len(values) - 1:
-                st.metric("المعدل المطلوب (رينج)", f"{max(0, min_required_gpa):.2f} - {min(4.0, max_required_gpa):.2f}")
+                st.metric("الرينج المطلوب", f"{max(0, min_required_gpa):.2f} - {min(4.0, max_required_gpa):.2f}")
                 st.caption(f"يجب أن تحافظ على معدل بين {max(0, min_required_gpa):.2f} و {min(4.0, max_required_gpa):.2f} للوصول لهذه الفئة.")
             else:
                 st.metric("المعدل الأدنى المطلوب", f"{max(0, min_required_gpa):.2f}")
