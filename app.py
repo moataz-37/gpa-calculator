@@ -66,34 +66,25 @@ with tab2:
 with tab3:
     st.subheader("تخطيط التخرج الذكي 🎓")
 
-    # تعريف التقديرات وقيمها
+    # تعريف التقديرات
     labels = ["مقبول", "جيد", "جيد جداً", "ممتاز"]
     values = [1.0, 1.7, 2.7, 3.5]
     
-    # تهيئة الحالة
     if 'idx' not in st.session_state:
         st.session_state.idx = 1 # البداية عند "جيد"
 
-    # توزيع الأزرار والسلايدر في سطر واحد
-    c1, c2, c3 = st.columns([1, 6, 1])
+    # الأزرار للتحكم في التقدير
+    col_btn1, col_btn2 = st.columns([1, 4])
     
-    with c1:
+    with col_btn1:
         if st.button("➖"):
             if st.session_state.idx > 0: st.session_state.idx -= 1
-    
-    with c2:
-        st.session_state.idx = st.select_slider(
-            "اختر التقدير المستهدف:",
-            options=range(len(labels)),
-            value=st.session_state.idx,
-            format_func=lambda x: labels[x]
-        )
-        
-    with c3:
         if st.button("➕"):
             if st.session_state.idx < len(labels) - 1: st.session_state.idx += 1
-
-    # استخراج القيمة المختارة
+            
+    with col_btn2:
+        st.write(f"### التقدير المستهدف: {labels[st.session_state.idx]}")
+        
     target_val = values[st.session_state.idx]
     
     # المدخلات الأساسية
