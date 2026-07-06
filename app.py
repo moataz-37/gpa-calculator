@@ -62,12 +62,18 @@ with tab2:
         cgpa = total_points / total_hours
         st.metric("المعدل التراكمي النهائي", f"{cgpa:.2f}")
         st.write(f"### التقدير العام: {get_grade_label(cgpa)}")
-
 with tab3:
     st.subheader("تخطيط التخرج الذكي 🎓")
     
-    # المدخلات
-    target_gpa = st.select_slider("التقدير المستهدف:", options=[1.0, 1.7, 2.7, 3.5], format_func=get_grade_label)
+    # تحويل السلايدر لـ number_input دقيق (بالزرار)
+    target_gpa = st.number_input(
+        "أدخل المعدل التراكمي المستهدف للتخرج:", 
+        min_value=1.0, 
+        max_value=4.0, 
+        value=3.0, 
+        step=0.1
+    )
+    st.write(f"التقدير المستهدف: **{get_grade_label(target_gpa)}**")
     
     col1, col2 = st.columns(2)
     with col1:
@@ -75,19 +81,17 @@ with tab3:
     with col2:
         terms_done = st.number_input("عدد الترمات التي أنهيتها:", min_value=0, value=6)
     
-    current_cgpa = st.number_input("المعدل التراكمي الحالي:", min_value=0.0, max_value=4.0, value=2.0, step=0.01)
+    current_cgpa = st.number_input("معدلك التراكمي الحالي:", min_value=0.0, max_value=4.0, value=2.0, step=0.01)
     
-    # الحساب التلقائي (بدون زرار)
+    # الحساب التلقائي
     done_hours = terms_done * 18
     rem_hours = terms_left * 18
     total_hours = done_hours + rem_hours
     
-    # معادلة التخطيط
     if total_hours > 0:
         total_needed_points = target_gpa * total_hours
         current_points = current_cgpa * done_hours
         
-        # التأكد من عدم القسمة على صفر إذا كان المتبقي 0
         if rem_hours > 0:
             required_gpa = (total_needed_points - current_points) / rem_hours
             
