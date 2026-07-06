@@ -64,7 +64,7 @@ with tab2:
         st.write(f"### التقدير العام: {get_grade_label(cgpa)}")
         
 with tab3:
-    st.subheader("تخطيط التخرج الذكي 🎓")
+    st.subheader("تخطيط التخرج الواقعي 🎯")
 
     # تعريف التقديرات
     labels = ["مقبول", "جيد", "جيد جداً", "ممتاز"]
@@ -73,9 +73,7 @@ with tab3:
     if 'idx' not in st.session_state:
         st.session_state.idx = 1 
 
-    # الأزرار (الزائد فوق)
     col_btn1, col_btn2 = st.columns([1, 4])
-    
     with col_btn1:
         if st.button("➕"):
             if st.session_state.idx < len(labels) - 1: st.session_state.idx += 1
@@ -87,35 +85,41 @@ with tab3:
         
     target_val = values[st.session_state.idx]
     
-    # المدخلات الأساسية
     col1, col2 = st.columns(2)
     terms_left = col1.number_input("عدد الترمات المتبقية:", min_value=0, max_value=10, value=4)
     terms_done = col2.number_input("عدد الترمات التي أنهيتها:", min_value=0, max_value=10, value=6)
     current_cgpa = st.number_input("معدلك التراكمي الحالي:", min_value=0.0, max_value=4.0, value=2.0, step=0.01)
     
-    # شرط الـ 10 ترمات
     total_terms = terms_left + terms_done
     
     if total_terms > 10:
-        st.error(f"⚠️ خطأ: إجمالي عدد الترمات ({total_terms}) يتجاوز الحد الأقصى (10 ترمات).")
-    elif total_terms == 0:
-        st.info("يرجى إدخال عدد الترمات.")
-    else:
-        # الحساب التلقائي
+        st.error(f"⚠️ خطأ: إجمالي عدد الترمات ({total_terms}) يتجاوز 10.")
+    elif total_terms > 0 and terms_left > 0:
         done_hours = terms_done * 18
         rem_hours = terms_left * 18
         total_hours = done_hours + rem_hours
         
-        if rem_hours > 0:
-            required_gpa = (target_val * total_hours - current_cgpa * done_hours) / rem_hours
-            
-            st.write("---")
-            if required_gpa > 4.0:
-                st.error(f"لا يمكن الوصول لتقدير {labels[st.session_state.idx]} بالمعدل الحالي.")
-            elif required_gpa < 0:
-                st.success("أنت بالفعل حققت هذا التقدير أو أكثر!")
-            else:
-                st.metric("المعدل المطلوب في الترمات القادمة", f"{required_gpa:.2f}")
-                st.info(f"يجب أن تحافظ على معدل **{required_gpa:.2f}** لتتخرج بتقدير **{labels[st.session_state.idx]}**.")
+        # الحساب للتقدير المستهدف
+        min_required_gpa = (target_val * total_hours - current_cgpa * done_hours) / rem_hours
+        
+        st.write("---")
+        
+        if min_required_gpa > 4.0:
+            st.error(f"لا يمكن الوصول لتقدير {labels[st.session_state.idx]} بالمعدل الحالي.")
+        elif min_required_gpa < 0:
+            st.success("أنت بالفعل حققت هذا التقدير أو أكثر!")
         else:
-            st.success("لقد أنهيت جميع الترمات المطلوبة!")
+            # هنا التغيير: عرض "الرينج" المطلوب
+            st.info(f"للحصول على تقدير **{labels[st.session_state.idx]}**:")
+            
+            # حساب التقدير التالي للرينج
+            next_idx = min(st.session_state.idx + 1, len(values) - 1)
+            next_val = values[next_idx]
+            max_required_gpa = (next_val * total_hours - current_cgpa * done_hours) / rem_hours
+            
+            # عرض الرينج
+            if st.session_state.idx < len(values) - 1:
+                st.metric("المعدل المطلوب (رينج)", f"{max(0, min_required_gpa):.2f} - {min(4.0, max_required_gpa):.2f}")
+                st.caption(f"يجب أن تحافظ على معدل بين {max(0, min_required_gpa):.2f} و {min(4.0, max_required_gpa):.2f} للوصول لهذه الفئة.")
+            else:
+                st.metric("المعدل الأدنى المطلوب", f"{max(0, min_required_gpa):.2f}")
