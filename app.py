@@ -4,7 +4,7 @@ from PIL import Image
 # إعدادات الصفحة
 st.set_page_config(page_title="بصمجيات", layout="centered")
 
-# إضافة اللوجو في أعلى الصفحة
+# إضافة اللوجو
 try:
     image = Image.open('logo.jpg') 
     st.image(image, width=150)
@@ -15,9 +15,17 @@ st.title("بصمجيات ⚡")
 
 grade_map = {'A': 4.0, 'A-': 3.7, 'B+': 3.3, 'B': 3.0, 'B-': 2.7, 'C+': 2.3, 'C': 2.0, 'C-': 1.7, 'D+': 1.3, 'D': 1.0, 'F': 0.0}
 
+# دالة التقدير (التي طلبتها)
+def get_grade_label(gpa):
+    if gpa >= 3.50: return "ممتاز"
+    elif gpa >= 2.70: return "جيد جداً"
+    elif gpa >= 1.70: return "جيد"
+    elif gpa >= 1.00: return "مقبول"
+    else: return "راسب"
+
 tab1, tab2 = st.tabs(["الترم الحالي", "التراكمي"])
 
-# حساب الترم (سريع وتلقائي)
+# حساب الترم
 with tab1:
     semester_points = 0
     total_hours = 0
@@ -30,11 +38,11 @@ with tab1:
     
     if total_hours == 18:
         gpa = semester_points / 18
-        st.success(f"النتيجة: {gpa:.2f}")
+        st.success(f"النتيجة: {gpa:.2f} - التقدير: {get_grade_label(gpa)}")
     else:
         st.warning(f"مجموع الساعات الحالي: {total_hours}/18")
 
-# حساب التراكمي (تلقائي مع الخيارات)
+# حساب التراكمي
 with tab2:
     num_prev_terms = st.number_input("عدد الترمات السابقة:", min_value=0, value=0)
     prev_gpa = st.number_input("المعدل التراكمي السابق (CGPA):", min_value=0.0, max_value=4.0, step=0.01)
@@ -55,5 +63,6 @@ with tab2:
     if total_hours > 0:
         cgpa = total_points / total_hours
         st.metric("المعدل التراكمي النهائي", f"{cgpa:.2f}")
+        st.write(f"### التقدير العام: {get_grade_label(cgpa)}")
     else:
         st.info("أدخل البيانات ليظهر التراكمي تلقائياً")
