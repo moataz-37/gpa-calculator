@@ -62,7 +62,7 @@ with tab2:
         st.write(f"### التقدير العام: {get_grade_label(cgpa)}")
         
 with tab3:
-    st.subheader("تخطيط للتخرج")
+    st.subheader("حساب تقدير التخرج")
 
     # تعريف التقديرات
     labels = ["مقبول", "جيد", "جيد جداً", "ممتاز"]
